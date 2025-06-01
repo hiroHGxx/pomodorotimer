@@ -82,26 +82,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const testModeBtn = document.getElementById('testModeToggle');
         
         if (isTestMode) {
-            WORK_DURATION = TEST_WORK_DURATION;
-            BREAK_DURATION = TEST_BREAK_DURATION;
             testModeBtn.textContent = 'テストモード: ON';
             testModeBtn.classList.add('test-mode-on');
         } else {
-            WORK_DURATION = NORMAL_WORK_DURATION;
-            BREAK_DURATION = NORMAL_BREAK_DURATION;
             testModeBtn.textContent = 'テストモード: OFF';
             testModeBtn.classList.remove('test-mode-on');
         }
         
         // タイマーをリセットして新しい設定を反映
         resetTimer();
+        
+        console.log('テストモード:', isTestMode ? 'ON' : 'OFF');
+        console.log('作業時間:', WORK_DURATION / 60 + '分');
+        console.log('休憩時間:', BREAK_DURATION / 60 + '分');
     }
 
     // タイマーをリセット
     function resetTimer() {
         pauseTimer();
         isWorkSession = true;
-        timeLeft = WORK_DURATION;
+        // 現在のモードに応じた時間を設定
+        timeLeft = isTestMode ? TEST_WORK_DURATION : NORMAL_WORK_DURATION;
+        WORK_DURATION = isTestMode ? TEST_WORK_DURATION : NORMAL_WORK_DURATION;
+        BREAK_DURATION = isTestMode ? TEST_BREAK_DURATION : NORMAL_BREAK_DURATION;
         sessionType.textContent = '作業時間';
         updateDisplay();
     }
