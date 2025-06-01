@@ -8,14 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const sessionCountElement = document.getElementById('session-count');
 
     // 設定
-    let WORK_DURATION = 25 * 60; // 25分（秒単位）
-    let BREAK_DURATION = 5 * 60; // 5分（秒単位）
-    let isTestMode = false;
-    const NORMAL_WORK_DURATION = 25 * 60;
-    const NORMAL_BREAK_DURATION = 5 * 60;
-    const TEST_WORK_DURATION = 1 * 60; // テスト用: 1分
-    const TEST_BREAK_DURATION = 0.5 * 60; // テスト用: 30秒
-    
+    const WORK_DURATION = 25 * 60; // 25分（秒単位）
+    const BREAK_DURATION = 5 * 60; // 5分（秒単位）
     let timeLeft = WORK_DURATION; // 残り時間（秒）
     let timerId = null;
     let isRunning = false;
@@ -49,22 +43,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (timeLeft <= 0) {
                 clearInterval(timerId);
                 isRunning = false; // タイマーを停止
-                playAlarm();
                 
                 if (isWorkSession) {
                     // 作業時間終了 → 休憩に移行
                     sessionCount++;
                     sessionCountElement.textContent = sessionCount;
                     isWorkSession = false;
-                    timeLeft = isTestMode ? TEST_BREAK_DURATION : NORMAL_BREAK_DURATION;
+                    timeLeft = BREAK_DURATION;
                     sessionType.textContent = '休憩時間';
-                    showNotification('お疲れ様でした！休憩しましょう。');
                 } else {
                     // 休憩終了 → 作業に移行
                     isWorkSession = true;
-                    timeLeft = isTestMode ? TEST_WORK_DURATION : NORMAL_WORK_DURATION;
+                    timeLeft = WORK_DURATION;
                     sessionType.textContent = '作業時間';
-                    showNotification('休憩が終わりました。作業を再開しましょう！');
                 }
                 
                 updateDisplay();
@@ -80,35 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
         isRunning = false;
     }
 
-    // テストモードを切り替え
-    function toggleTestMode() {
-        isTestMode = !isTestMode;
-        const testModeBtn = document.getElementById('testModeToggle');
-        
-        if (isTestMode) {
-            testModeBtn.textContent = 'テストモード: ON';
-            testModeBtn.classList.add('test-mode-on');
-        } else {
-            testModeBtn.textContent = 'テストモード: OFF';
-            testModeBtn.classList.remove('test-mode-on');
-        }
-        
-        // タイマーをリセットして新しい設定を反映
-        resetTimer();
-        
-        console.log('テストモード:', isTestMode ? 'ON' : 'OFF');
-        console.log('作業時間:', WORK_DURATION / 60 + '分');
-        console.log('休憩時間:', BREAK_DURATION / 60 + '分');
-    }
-
     // タイマーをリセット
     function resetTimer() {
         pauseTimer();
         isWorkSession = true;
-        // 現在のモードに応じた時間を設定
-        timeLeft = isTestMode ? TEST_WORK_DURATION : NORMAL_WORK_DURATION;
-        WORK_DURATION = isTestMode ? TEST_WORK_DURATION : NORMAL_WORK_DURATION;
-        BREAK_DURATION = isTestMode ? TEST_BREAK_DURATION : NORMAL_BREAK_DURATION;
+        timeLeft = WORK_DURATION;
         sessionType.textContent = '作業時間';
         updateDisplay();
     }
@@ -139,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
     startButton.addEventListener('click', startTimer);
     pauseButton.addEventListener('click', pauseTimer);
     resetButton.addEventListener('click', resetTimer);
-    document.getElementById('testModeToggle').addEventListener('click', toggleTestMode);
 
     // ビルド日時を表示
     function showBuildTime() {
