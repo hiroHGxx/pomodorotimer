@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (timeLeft <= 0) {
                 clearInterval(timerId);
                 isRunning = false; // タイマーを停止
+                playAlarm();
                 
                 if (isWorkSession) {
                     // 作業時間終了 → 休憩に移行
@@ -51,11 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     isWorkSession = false;
                     timeLeft = BREAK_DURATION;
                     sessionType.textContent = '休憩時間';
+                    showNotification('お疲れ様でした！休憩しましょう。');
                 } else {
                     // 休憩終了 → 作業に移行
                     isWorkSession = true;
                     timeLeft = WORK_DURATION;
                     sessionType.textContent = '作業時間';
+                    showNotification('休憩が終わりました。作業を再開しましょう！');
                 }
                 
                 updateDisplay();
