@@ -37,37 +37,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // タイマーを開始
     function startTimer() {
-        if (!isRunning) {
-            isRunning = true;
-            timerId = setInterval(() => {
-                timeLeft--;
-                updateDisplay();
+        if (isRunning) return;  // 既に実行中の場合は何もしない
+        
+        isRunning = true;
+        clearInterval(timerId); // 既存のタイマーをクリア
+        
+        timerId = setInterval(() => {
+            timeLeft--;
+            updateDisplay();
 
-                if (timeLeft <= 0) {
-                    clearInterval(timerId);
-                    playAlarm();
-                    
-                    if (isWorkSession) {
-                        // 作業時間終了 → 休憩に移行
-                        sessionCount++;
-                        sessionCountElement.textContent = sessionCount;
-                        isWorkSession = false;
-                        timeLeft = BREAK_DURATION;
-                        sessionType.textContent = '休憩時間';
-                        showNotification('お疲れ様でした！休憩しましょう。');
-                    } else {
-                        // 休憩終了 → 作業に移行
-                        isWorkSession = true;
-                        timeLeft = WORK_DURATION;
-                        sessionType.textContent = '作業時間';
-                        showNotification('休憩が終わりました。作業を再開しましょう！');
-                    }
-                    
-                    updateDisplay();
-                    startTimer(); // 自動的に次のセッションを開始
+            if (timeLeft <= 0) {
+                clearInterval(timerId);
+                isRunning = false; // タイマーを停止
+                playAlarm();
+                
+                if (isWorkSession) {
+                    // 作業時間終了 → 休憩に移行
+                    sessionCount++;
+                    sessionCountElement.textContent = sessionCount;
+                    isWorkSession = false;
+                    timeLeft = isTestMode ? TEST_BREAK_DURATION : NORMAL_BREAK_DURATION;
+                    sessionType.textContent = '休憩時間';
+                    showNotification('お疲れ様でした！休憩しましょう。');
+                } else {
+                    // 休憩終了 → 作業に移行
+                    isWorkSession = true;
+                    timeLeft = isTestMode ? TEST_WORK_DURATION : NORMAL_WORK_DURATION;
+                    sessionType.textContent = '作業時間';
+                    showNotification('休憩が終わりました。作業を再開しましょう！');
                 }
-            }, 1000);
-        }
+                
+                updateDisplay();
+                // 自動的に次のセッションを開始
+                setTimeout(() => startTimer(), 1000);
+            }
+        }, 1000);
     }
 
     // タイマーを一時停止
