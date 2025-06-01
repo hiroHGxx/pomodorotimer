@@ -8,8 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const sessionCountElement = document.getElementById('session-count');
 
     // 設定
-    const WORK_DURATION = 25 * 60; // 25分（秒単位）
-    const BREAK_DURATION = 5 * 60; // 5分（秒単位）
+    let WORK_DURATION = 25 * 60; // 25分（秒単位）
+    let BREAK_DURATION = 5 * 60; // 5分（秒単位）
+    let isTestMode = false;
+    const NORMAL_WORK_DURATION = 25 * 60;
+    const NORMAL_BREAK_DURATION = 5 * 60;
+    const TEST_WORK_DURATION = 1 * 60; // テスト用: 1分
+    const TEST_BREAK_DURATION = 0.5 * 60; // テスト用: 30秒
     
     let timeLeft = WORK_DURATION; // 残り時間（秒）
     let timerId = null;
@@ -71,6 +76,27 @@ document.addEventListener('DOMContentLoaded', () => {
         isRunning = false;
     }
 
+    // テストモードを切り替え
+    function toggleTestMode() {
+        isTestMode = !isTestMode;
+        const testModeBtn = document.getElementById('testModeToggle');
+        
+        if (isTestMode) {
+            WORK_DURATION = TEST_WORK_DURATION;
+            BREAK_DURATION = TEST_BREAK_DURATION;
+            testModeBtn.textContent = 'テストモード: ON';
+            testModeBtn.classList.add('test-mode-on');
+        } else {
+            WORK_DURATION = NORMAL_WORK_DURATION;
+            BREAK_DURATION = NORMAL_BREAK_DURATION;
+            testModeBtn.textContent = 'テストモード: OFF';
+            testModeBtn.classList.remove('test-mode-on');
+        }
+        
+        // タイマーをリセットして新しい設定を反映
+        resetTimer();
+    }
+
     // タイマーをリセット
     function resetTimer() {
         pauseTimer();
@@ -106,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startButton.addEventListener('click', startTimer);
     pauseButton.addEventListener('click', pauseTimer);
     resetButton.addEventListener('click', resetTimer);
+    document.getElementById('testModeToggle').addEventListener('click', toggleTestMode);
 
     // 初期表示を更新
     updateDisplay();
